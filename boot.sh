@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 cd $REQPROC_PATH
-mkdir -p logs
+mkdir logs
 
 # REQEXEC_PATH is path to reqExec files packaged inside the reqProc docker image
 # REQEXEC_PATH is set during building docker image for reqProc
