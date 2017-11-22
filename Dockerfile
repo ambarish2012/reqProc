@@ -15,7 +15,7 @@ RUN mkdir $EXEC_TEMPLATES_PATH && \
 
 ENV REQEXEC_PATH  %USERPROFILE%\shippable\reqExec
 RUN mkdir -p $REQEXEC_PATH && \
-    wget https://s3.amazonaws.com/shippable-artifacts/reqExec/{{%TAG%}}/reqExec-{{%TAG%}}-{{%ARCHITECTURE%}}-{{%OS%}}.tar.gz -O %TMP%\reqExec.tar.gz && \
+    wget --no-check-certificate https://s3.amazonaws.com/shippable-artifacts/reqExec/master/reqExec-master-x86_64-Ubuntu.tar.gz -O %TMP%\reqExec.tar.gz && \
     tar -xzvf  %TMP%\reqExec.tar.gz -C $REQEXEC_PATH && \
     del  %TMP%\reqExec.tar.gz
 
