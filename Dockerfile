@@ -1,22 +1,24 @@
-FROM stefanscherer/node-windows:8.9.1-nanoserver
+FROM stefanscherer/node-windows:8.9.1-windowsservercore
 
-ENV REQPROC_PATH %USERPROFILE%\shippable\reqProc
-RUN echo $REQPROC_PATH
-RUN mkdir $REQPROC_PATH
-RUN mkdir $REQPROC_BIN_PATH
-ADD . $REQPROC_PATH
-RUN cd $REQPROC_PATH && npm install
+ADD https://www.python.org/ftp/python/2.7.14/python-2.7.14.msi /temp/python.msi
+RUN msiexec.exe /i "/temp/python.msi" /qn
 
-ENV EXEC_TEMPLATES_PATH  %USERPROFILE%\shippable\execTemplates
-RUN mkdir $EXEC_TEMPLATES_PATH && \
-    wget https://github.com/Shippable/execTemplates/archive/master.tar.gz -O %TMP%\execTemplates.tar.gz && \
-    tar -xzvf /tmp/execTemplates.tar.gz -C $EXEC_TEMPLATES_PATH --strip-components=1 && \
+RUN mkdir %USERPROFILE%\shippable\reqproc
+WORKDIR %USERPROFILE%\shippable\reqproc
+ADD . .
+RUN dir
+RUN npm install
+
+RUN mkdir %USERPROFILE%\shippable\execTemplates
+WORKDIR %USERPROFILE%\shippable\execTemplates
+RUN ..\shippable\reqproc\windows\utils\wget https://github.com/Shippable/execTemplates/archive/master.tar.gz -O %TMP%\execTemplates.tar.gz && \
+    ..\shippable\reqproc\windows\utils\gzip -d  %TMP%\execTemplates.tar.gz && \
+    copy %TMP%\execTemplates.tar . && \
+    ..\shippable\reqproc\windows\utils\tar xvf execTemplates.tar && \
     del %TMP%\execTemplates.tar.gz
 
-ENV REQEXEC_PATH  %USERPROFILE%\shippable\reqExec
-RUN mkdir -p $REQEXEC_PATH && \
-    wget --no-check-certificate https://s3.amazonaws.com/shippable-artifacts/reqExec/master/reqExec-master-x86_64-Ubuntu.tar.gz -O %TMP%\reqExec.tar.gz && \
-    tar -xzvf  %TMP%\reqExec.tar.gz -C $REQEXEC_PATH && \
-    del  %TMP%\reqExec.tar.gz
+RUN mkdir %USERPROFILE%\shippable\reqexec
+WORKDIR %USERPROFILE%\shippable\reqexec
+COPY .\windows\reqexec\bin\main.exe .
 
-ENTRYPOINT ["$REQPROC_PATH\boot.sh"]
+CMD %USERPROFILE%\shippable\reqproc\boot.bat
